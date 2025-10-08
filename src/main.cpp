@@ -3,6 +3,7 @@
 
 #define MIN_PULSE_WIDTH 1148
 #define MAX_PULSE_WIDTH 1832
+#define PWM_FREQUENCY 50
 
 // put function declarations here:
 Servo esc; 
@@ -17,10 +18,12 @@ int throttle = MIN_PULSE_WIDTH;
 int throttleSerial = MIN_PULSE_WIDTH;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
-  while(!(Serial.available() && Serial.read() == 'G'));
-  Serial.println("Start");
+  Serial.println("プロペラを外していることを確認してください。確認できたら、シリアルモニタから何かを送信してください。");
+
+  //何か受信するまで待機
+  while(!(Serial.available()));
+  Serial.println("Starting ESP32 ESC Calibration...");
 
   //pinModeの設定
   pinMode(escPin_A, OUTPUT);
@@ -34,65 +37,39 @@ void setup() {
   digitalWrite(escPin_C, LOW);
   digitalWrite(escPin_D, LOW);
 
-//500ms待機
-  delay(500);
-
   //Hzの設定
-  esc.setPeriodHertz(50);
+  esc.setPeriodHertz(PWM_FREQUENCY);
   esc.attach(escPin_A, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
   //esc.attach(escPin_B, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
   //esc.attach(escPin_C, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
   //esc.attach(escPin_D, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
   Serial.println("Attached");
 
-  //スピードアップしている信号を送る
-  int j = 10;
-  int plus = 50;
-  int speedup = MAX_PULSE_WIDTH - (j * plus);
-  for(int i = 0; i < j; i++){
-    Serial.print("Throttle: ");
-    Serial.println(speedup);
-    esc.writeMicroseconds(speedup);
-    speedup += plus;
-    delay(100);
-  }
-  Serial.println("Throttle up done");
-  delay(1000);
+  esc.writeMicroseconds(MAX_PULSE_WIDTH);
+  Serial.println("Throttle max");
+  Serial.println("ESCの電源を入れてください。");
 
-  //スロットルを0にする（最小ということでいいはず）
+  delay(500);
+
+  Serial.println("Sending Minimum throttle...");
   esc.writeMicroseconds(MIN_PULSE_WIDTH);
-  Serial.println("Throttle min");
-  delay(1000);
+  
+  delay(3000);
   Serial.println("Calibrated");
   }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(100);
-  esc.writeMicroseconds(throttleSerial);
-  Serial.print("Throttle: ");
-  Serial.println(throttleSerial);
   if(Serial.available() > 0){
-    delay(20);
-    byte data_size = Serial.available();
-    byte buf[data_size];
-    Serial.print("Data size:");
-    Serial.println(data_size);
-
-    for (byte i = 0; i < data_size; i++){
-      buf[i] = Serial.read() - '0';
+    int newThrottle = Serial.parseInt();
+    if (newThrottle <= MAX_PULSE_WIDTH && newThrottle >= MIN_PULSE_WIDTH){
+      throttle = newThrottle;
+      Serial.print("Throttle: ");
+      Serial.println(throttle);
+    }else{
+      Serial.println("Invalid throttle value. Must be 1148-1832");
     }
-    Serial.println();
-
-    int dub = 1;
-    throttleSerial = 0;
-    for (byte i = 0; i < data_size; i++){
-      throttleSerial += buf[data_size - 1 - i] * dub;
-      dub *= 10;
-    }
-    Serial.print(throttleSerial);
   }
-  throttleSerial = min(MAX_PULSE_WIDTH, throttleSerial);
-  throttleSerial = max(MIN_PULSE_WIDTH, throttleSerial);
+  esc.writeMicroseconds(throttle);
 
+  delay(10);
 }
