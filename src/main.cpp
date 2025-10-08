@@ -40,9 +40,9 @@ void setup() {
   //Hzの設定
   esc.setPeriodHertz(PWM_FREQUENCY);
   esc.attach(escPin_A, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-  //esc.attach(escPin_B, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-  //esc.attach(escPin_C, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-  //esc.attach(escPin_D, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  esc.attach(escPin_B, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  esc.attach(escPin_C, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  esc.attach(escPin_D, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
   Serial.println("Attached");
 
   esc.writeMicroseconds(MAX_PULSE_WIDTH);
