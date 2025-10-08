@@ -5,7 +5,7 @@
 #define MAX_PULSE_WIDTH 1832
 
 // put function declarations here:
-Servo esc;
+Servo esc; 
 
 //モーターのピンの設定
 const int escPin_A = 5;
@@ -40,17 +40,20 @@ void setup() {
   //Hzの設定
   esc.setPeriodHertz(50);
   esc.attach(escPin_A, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-  esc.attach(escPin_B, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-  esc.attach(escPin_C, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-  esc.attach(escPin_D, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  //esc.attach(escPin_B, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  //esc.attach(escPin_C, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  //esc.attach(escPin_D, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
   Serial.println("Attached");
 
   //スピードアップしている信号を送る
-  for(int i = 0; i < 10; i++){
+  int j = 10;
+  int plus = 50;
+  int speedup = MAX_PULSE_WIDTH - (j * plus);
+  for(int i = 0; i < j; i++){
     Serial.print("Throttle: ");
-    Serial.println(throttle);
-    esc.writeMicroseconds(throttle);
-    throttle += 50;
+    Serial.println(speedup);
+    esc.writeMicroseconds(speedup);
+    speedup += plus;
     delay(100);
   }
   Serial.println("Throttle up done");

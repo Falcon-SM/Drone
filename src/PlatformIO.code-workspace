@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../LED_On"
+		},
+		{
+			"name": "AMP_ESP32_Command",
+			"path": "../../AMP_ESP32_Command"
+		},
+		{
+			"name": "Drone",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
